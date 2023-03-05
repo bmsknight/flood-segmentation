@@ -66,7 +66,7 @@ save_callback = tf.keras.callbacks.ModelCheckpoint(save_filename, period=50)
 epochs = 201
 loss0 = 'binary_crossentropy'
 loss1 = 'dice'
-loss2
+loss2 = 'mse
 
 model.compile(optimizer='adam', loss=loss2, metrics=['accuracy'])
 history=model.fit(Xtrain, ytrain, validation_split=0.2, batch_size=5, verbose=True, epochs=epochs, callbacks=callbacks)
