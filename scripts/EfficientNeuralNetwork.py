@@ -1,5 +1,4 @@
-import os # Importing necessary libraries for the implementation of the model
-import random
+import os 
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, Concatenate, BatchNormalization, Dropout
@@ -57,18 +56,11 @@ inputs = Input(shape=input_shape)
 outputs = enet(inputs, num_classes)
 model = Model(inputs, outputs)
 
-# prepare model folder
-model_dir = model_dir
-os.makedirs(model_dir, exist_ok=True)
-# gpu = 0
-# tensorflow device handling
-device, nb_devices = vxm.tf.utils.setup_device(gpu)
-assert np.mod(batch_size, nb_devices) == 0, \
-    'Batch size (%d) should be a multiple of the nr of gpus (%d)' % (batch_size, nb_devices)
+model_dir = '/content/drive/MyDrive/data'
+save_filename = os.path.join(model_dir, '{epoch:04d}.h5')
+save_callback = tf.keras.callbacks.ModelCheckpoint(save_filename, period=50)
+epochs = 201
+loss = binary_crossentropy
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-callbacks=[
-     tf.keras.callbacks.EarlyStopping(patience=2, monitor="val_loss"),
-    tf.keras.callbacks.TensorBoard(log_dir="logs")]
-
-model.fit(Xtrain, ytrain, validation_split=0.2, batch_size=5, verbose=True, epochs=100, callbacks=callbacks)
+model.compile(optimizer='adam', loss=loss, metrics=['accuracy'])
+model.fit(Xtrain, ytrain, validation_split=0.2, batch_size=5, verbose=True, epochs=epochs, callbacks=callbacks)
