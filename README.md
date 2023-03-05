@@ -9,7 +9,7 @@ The data set used is from Kaggle https://www.kaggle.com/datasets/faizalkarim/flo
 
 1. Vision Transformers
 2. Unet
-3. .....
+3. ENet (Efficient Neural Network)
 
 ### Repo Structure
 
