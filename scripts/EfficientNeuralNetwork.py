@@ -60,7 +60,7 @@ model_dir = '/content/drive/MyDrive/data'
 save_filename = os.path.join(model_dir, '{epoch:04d}.h5')
 save_callback = tf.keras.callbacks.ModelCheckpoint(save_filename, period=50)
 epochs = 201
-loss = binary_crossentropy
+loss = 'binary_crossentropy'
 
 model.compile(optimizer='adam', loss=loss, metrics=['accuracy'])
 model.fit(Xtrain, ytrain, validation_split=0.2, batch_size=5, verbose=True, epochs=epochs, callbacks=callbacks)
