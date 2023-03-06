@@ -1,0 +1,6 @@
+DATA_DIR = "./data"
+INP_H = 160
+INP_W = 240
+BATCH_SIZE = 8
+SHUFFLE = True
+RANDOM_SEED = 42
