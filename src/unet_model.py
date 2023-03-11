@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torchsummary import summary
 from src.constants import *
+import torchvision.transforms.functional as TF
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
