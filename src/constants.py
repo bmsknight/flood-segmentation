@@ -1,6 +1,11 @@
-DATA_DIR = "./dataset"
-INP_H = 256
-INP_W = 256
+TRAIN_DATA_DIR = "./dataset/train"
+TEST_DATA_DIR = "./dataset/test"
+IMG_H = 256
+IMG_W = 256
+IN_CHANNELS = 3
+OUT_CHANNELS = 1
 BATCH_SIZE = 8
 SHUFFLE = True
+LEARNING_RATE = 1e-5
+EPOCHS = 500
 RANDOM_SEED = 0

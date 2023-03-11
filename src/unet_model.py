@@ -3,17 +3,16 @@
 import torch
 import torch.nn as nn
 from torchsummary import summary
-import torchvision.transforms.functional as TF
+from src.constants import *
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-class UNET:
-    def __init__(self) -> None:
-        pass
-
 
 class UnetModel(nn.Module):
-    def __init__(self, in_channels, out_channels, features=[64, 128, 256, 512]) -> None:
+    def __init__(self, 
+                 in_channels, 
+                 out_channels, 
+                 features=[64, 128, 256, 512]) -> None:
         super().__init__()
 
         self.downs = nn.ModuleList()
@@ -74,8 +73,8 @@ class DoubleConv(nn.Module):
 
 
 def test():
-    input_shape = (256, 256)
-    model = UnetModel(in_channels=3, out_channels=1).to(DEVICE)
+    input_shape = (IMG_H, IMG_W)
+    model = UnetModel(in_channels=IN_CHANNELS, out_channels=OUT_CHANNELS).to(DEVICE)
     summary(model, input_size=(3, input_shape[0], input_shape[1]), device=DEVICE)
     x = torch.randn(2, 3, input_shape[0], input_shape[1], device=DEVICE)
     print(model(x).shape)
