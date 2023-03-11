@@ -1,6 +1,6 @@
-DATA_DIR = "./data"
-INP_H = 160
-INP_W = 240
+DATA_DIR = "./dataset"
+INP_H = 256
+INP_W = 256
 BATCH_SIZE = 8
 SHUFFLE = True
-RANDOM_SEED = 42
+RANDOM_SEED = 0
