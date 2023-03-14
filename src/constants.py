@@ -1,5 +1,5 @@
-TRAIN_DATA_DIR = "./dataset/train"
-TEST_DATA_DIR = "./dataset/test"
+TRAIN_DATA_DIR = "C:\\Users\\tehar\\OneDrive\\Documents\\Canada\\M.E.Sc\\ML_9309\\Project\\flood-segmentation\\data\\train"
+TEST_DATA_DIR = "C:\\Users\\tehar\\OneDrive\\Documents\\Canada\\M.E.Sc\\ML_9309\\Project\\flood-segmentation\\data\\test"
 IMG_H = 256
 IMG_W = 256
 IN_CHANNELS = 3

@@ -1,3 +1,5 @@
+import sys
+sys.path.append('./')
 import torch
 import numpy as np
 import os
@@ -6,6 +8,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torchvision import transforms, utils
 import torchvision.transforms.functional as TF
+from src.constants import IMG_H, IMG_W
 torch.manual_seed(0)
 
 
@@ -13,11 +16,18 @@ class SegDataset(Dataset):
     def __init__(self, 
                  image_dir,
                  mask_dir,
+                 img_h=IMG_H,
+                 img_w=IMG_W,
                  transform=None) -> None:
         super().__init__()
         self.image_dir = image_dir
         self.mask_dir = mask_dir
+        self.img_h = img_h
+        self.img_w = img_w
         self.transform = transform
+        if self.transform is None:
+            self.transform = transforms.Compose([TF.to_tensor, 
+                                                 transforms.Resize(size=(self.img_h, self.img_w))])
         self.images = os.listdir(self.image_dir)
 
     def __len__(self):
@@ -31,9 +41,8 @@ class SegDataset(Dataset):
         mask = np.array(Image.open(mask_path).convert("L")).astype(np.float32)  # Grey scale Mask
         mask = np.where(mask>127, 255., 0.) # Convert to binary values
 
-        if self.transform is not None:
-            image = self.transform(image)
-            mask = self.transform(mask)
+        image = self.transform(image)
+        mask = self.transform(mask)
 
         return image, mask
 
@@ -56,8 +65,8 @@ class AugDataset:
     def __init__(self,
                  image_dir,
                  mask_dir,
-                 img_h=256,
-                 img_w=256,
+                 img_h=IMG_H,
+                 img_w=IMG_W,
                  augment=False) -> None:
         self.image_dir = image_dir
         self.mask_dir = mask_dir
@@ -127,3 +136,12 @@ if __name__=='__main__':
 
     aug_train_dataset.save_transform('dataset\\train')
     aug_test_dataset.save_transform('dataset\\test')
+
+    # image_dir='data\\train\\Image'
+    # mask_dir='data\\train\\Mask'
+    # dataset = SegDataset(image_dir=image_dir, mask_dir=mask_dir)
+    # dataloader = SegDataLoader(dataset=dataset, batch_size=4, shuffle=True).get_dataloader()
+    # for index, data in enumerate(dataloader):
+    #     print(data[0].shape, data[1].shape)
+    #     if index>2:
+    #         break
