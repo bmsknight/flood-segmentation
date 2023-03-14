@@ -82,8 +82,9 @@ class UNET:
                 "optimizer": optimizer.state_dict()
             }
 
-            save_checkpoint(checkpoint, filename=os.path.join(os.makedirs(os.path.join(self.save_weights_path, EXPERIMENT_NAME)),
-                                                        f"unet_checkpoint_{epoch}.pth"))
+            ckpt_folder = os.path.join(self.save_weights_path, EXPERIMENT_NAME) 
+            os.makedirs(ckpt_folder, exist_ok=True)
+            save_checkpoint(checkpoint, filename=os.path.join(ckpt_folder, f"unet_checkpoint_{epoch}.pth"))
 
             self.test()
 
