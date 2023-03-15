@@ -24,7 +24,7 @@ class UNET:
                  train_folder=None,
                  test_folder=None,
                  load_weights_path=None,
-                 save_weights_path='Checkpoints') -> None:
+                 save_weights_path=os.path.join('runs',f'{EXPERIMENT_NAME}','checkpoints')) -> None:
         
         self.load_weights_path = load_weights_path
         self.save_weights_path = save_weights_path
@@ -48,6 +48,7 @@ class UNET:
         return data_loader
 
     def train_fn(self, optimizer, loss_fn, scaler):
+        print('Training in progress...')
         loop = tqdm(self.train_data_loader)
 
         for batch_idx, (data, targets) in enumerate(self.train_data_loader):
@@ -72,8 +73,9 @@ class UNET:
         optimizer = optim.Adam(self.model.parameters(), lr=LEARNING_RATE)
         scalar = torch.cuda.amp.GradScaler()
 
-        for epoch in range(EPOCHS):
+        for epoch in range(START_EPOCH, EPOCHS):
             print(f"Epoch: {epoch}")
+
             self.train_fn(optimizer, loss_fn, scalar)
 
             # Save model
@@ -82,24 +84,25 @@ class UNET:
                 "optimizer": optimizer.state_dict()
             }
 
-            ckpt_folder = os.path.join(self.save_weights_path, EXPERIMENT_NAME) 
-            os.makedirs(ckpt_folder, exist_ok=True)
-            save_checkpoint(checkpoint, filename=os.path.join(ckpt_folder, f"unet_checkpoint_{epoch}.pth"))
+            os.makedirs(self.save_weights_path, exist_ok=True)
+            save_checkpoint(checkpoint, filename=os.path.join(self.save_weights_path, f"unet_checkpoint_{epoch}.pth"))
 
-            self.test()
+            self.test(save_preds=True, directory=os.path.join('saved_images', f'{EXPERIMENT_NAME}', f'epoch-{epoch}_saved_images'))
 
-    def test(self):
+    def test(self, directory=os.path.join('runs',f'{EXPERIMENT_NAME}','saved_images'), save_preds=False):
             # check accuracy
             accuracy, dice_score = check_accuracy(self.test_data_loader, self.model, device=DEVICE)
             print(f'Accuracy:{accuracy}\nDice_Score:{dice_score}')
 
-            # print some examples to a folder
-            save_predictions_as_images(self.test_data_loader, self.model, device=DEVICE, directory="saved_images")
+            if save_preds:
+                print('Saving predictions...')
+                # print some examples to a folder
+                save_predictions_as_images(self.test_data_loader, self.model, device=DEVICE, directory=directory)
 
 if __name__ == '__main__':
     unet = UNET(TRAIN_DATA_DIR, 
                 TEST_DATA_DIR, 
                 load_weights_path=None,
                 save_weights_path='Checkpoints')
-    unet.train()
+    unet.test()
     

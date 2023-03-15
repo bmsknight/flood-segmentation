@@ -42,7 +42,6 @@ class SegDataset(Dataset):
 
         image = self.transform(image)
         mask = self.transform(mask)
-        print(mask.dtype)
 
         return image, (mask>127).float()
 

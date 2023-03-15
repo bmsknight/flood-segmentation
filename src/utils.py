@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./')
+import os
 import torch
 import torchvision
 from src.unet_model import DEVICE
@@ -20,10 +23,11 @@ def check_accuracy(loader, model, device=DEVICE):
     with torch.no_grad():
         for x, y in loader:
             x = x.to(device)
-            y = y.to(device).unsqueeze(1)
+            y = y.to(device)
 
             preds = torch.sigmoid(model(x))
             preds = (preds > 0.5).float()
+
             num_correct += (preds == y).sum()
             num_pixels += torch.numel(preds)
             dice_score += (2 * (preds * y).sum()) / ((preds+y).sum() + 1e-8)
@@ -37,6 +41,7 @@ def check_accuracy(loader, model, device=DEVICE):
 
 
 def save_predictions_as_images(loader, model, directory = "saved_images", device="cuda"):
+    os.makedirs(directory, exist_ok=True)
     model.eval()
 
     for idx, (x, y) in enumerate(loader):
@@ -50,7 +55,7 @@ def save_predictions_as_images(loader, model, directory = "saved_images", device
             preds, f"{directory}/pred_{idx}.png"
         )
         torchvision.utils.save_image(
-            y.unsqueeze(1), f"{directory}/gt_{idx}.png"
+            y, f"{directory}/gt_{idx}.png"
         )
     
     model.train()
