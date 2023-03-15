@@ -8,7 +8,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torchvision import transforms, utils
 import torchvision.transforms.functional as TF
-from src.constants import IMG_H, IMG_W
+from src.constants import IMG_H, IMG_W, BATCH_SIZE, SHUFFLE
 torch.manual_seed(0)
 
 
@@ -39,19 +39,19 @@ class SegDataset(Dataset):
         image = np.array(Image.open(image_path).convert("RGB"))
         mask_path = os.path.join(self.mask_dir, image_name.replace(".jpg", ".png")) 
         mask = np.array(Image.open(mask_path).convert("L")).astype(np.float32)  # Grey scale Mask
-        mask = np.where(mask>127, 255., 0.) # Convert to binary values
 
         image = self.transform(image)
         mask = self.transform(mask)
+        print(mask.dtype)
 
-        return image, mask
+        return image, (mask>127).float()
 
 
 class SegDataLoader:
     def __init__(self, 
                  dataset,
-                 batch_size=8,
-                 shuffle=True) -> None:
+                 batch_size=BATCH_SIZE,
+                 shuffle=SHUFFLE) -> None:
         self.dataset = dataset
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -83,7 +83,8 @@ class AugDataset:
         if self.augment:
             transformations.pop()
             transformations.extend([transforms.Resize(size=(2*self.img_h, 2*self.img_w)), 
-                                    transforms.TenCrop((self.img_h, self.img_w))])
+                                    transforms.TenCrop((self.img_h, self.img_w)), 
+                                    lambda x: torch.stack(list(x), dim=0)])
         data_transformation = transforms.Compose(transformations)
         return data_transformation
 
@@ -140,8 +141,9 @@ if __name__=='__main__':
     # image_dir='data\\train\\Image'
     # mask_dir='data\\train\\Mask'
     # dataset = SegDataset(image_dir=image_dir, mask_dir=mask_dir)
-    # dataloader = SegDataLoader(dataset=dataset, batch_size=4, shuffle=True).get_dataloader()
+    # dataloader = SegDataLoader(dataset=dataset, batch_size=8, shuffle=True).get_dataloader()
     # for index, data in enumerate(dataloader):
-    #     print(data[0].shape, data[1].shape)
+    #     print(index, data[0].shape, data[1].shape)
+    #     print(torch.unique(data[1]))
     #     if index>2:
     #         break
