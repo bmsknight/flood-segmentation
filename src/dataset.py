@@ -38,7 +38,7 @@ class SegDataset(Dataset):
         image_path = os.path.join(self.image_dir, image_name)
         image = np.array(Image.open(image_path).convert("RGB"))
         mask_path = os.path.join(self.mask_dir, image_name.replace(".jpg", ".png")) 
-        mask = np.array(Image.open(mask_path).convert("L")).astype(np.float32)  # Grey scale Mask
+        mask = np.array(Image.open(mask_path).convert("L")).astype(np.float32)  # Grayscale Mask
 
         image = self.transform(image)
         mask = self.transform(mask)

@@ -90,19 +90,19 @@ class UNET:
             self.test(save_preds=True, directory=os.path.join('saved_images', f'{EXPERIMENT_NAME}', f'epoch-{epoch}_saved_images'))
 
     def test(self, directory=os.path.join('runs',f'{EXPERIMENT_NAME}','saved_images'), save_preds=False):
-            # check accuracy
-            accuracy, dice_score = check_accuracy(self.test_data_loader, self.model, device=DEVICE)
-            print(f'Accuracy:{accuracy}\nDice_Score:{dice_score}')
+                # check accuracy
+                _ = check_accuracy(self.test_data_loader, self.model, device=DEVICE)
+                evaluate_all(self.model, self.test_data_loader)
+                if save_preds:
+                    print('Saving predictions...')
+                    # print some examples to a folder
+                    save_predictions_as_images(self.test_data_loader, self.model, device=DEVICE, directory=directory)
 
-            if save_preds:
-                print('Saving predictions...')
-                # print some examples to a folder
-                save_predictions_as_images(self.test_data_loader, self.model, device=DEVICE, directory=directory)
 
 if __name__ == '__main__':
-    unet = UNET(TRAIN_DATA_DIR, 
-                TEST_DATA_DIR, 
-                load_weights_path=None,
-                save_weights_path='Checkpoints')
-    unet.test()
+    unet = UNET(TRAIN_DATA_DIR,
+                TEST_DATA_DIR,
+                load_weights_path='runs\\2023-Mar-15_08h-10m-03s\\checkpoints\\unet_checkpoint_7.pth')
+    unet.test(save_preds=True)
+    # unet.train()
     
