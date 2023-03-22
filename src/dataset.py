@@ -146,3 +146,14 @@ if __name__=='__main__':
     #     print(torch.unique(data[1]))
     #     if index>2:
     #         break
+
+    # image_dir = 'data\\Image'
+    # mask_dir = 'data\\Mask'
+    # dataset = SegDataset(image_dir=image_dir, mask_dir=mask_dir)
+    # ones=0
+    # zeros=0
+    # for _, mask in dataset:
+    #     ones += torch.sum(mask==1.)
+    #     zeros += torch.sum(mask==0.)
+    # print(f'ones: {ones}\nzeros:{zeros}')
+    # assert ones+zeros == torch.numel(mask)*len(dataset)

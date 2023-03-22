@@ -90,9 +90,8 @@ class UNET:
             self.test(save_preds=True, directory=os.path.join('saved_images', f'{EXPERIMENT_NAME}', f'epoch-{epoch}_saved_images'))
 
     def test(self, directory=os.path.join('runs',f'{EXPERIMENT_NAME}','saved_images'), save_preds=False):
-                # check accuracy
-                _ = check_accuracy(self.test_data_loader, self.model, device=DEVICE)
-                evaluate_all(self.model, self.test_data_loader)
+                # Evaluate
+                _ = evaluate(self.test_data_loader, self.model, device=DEVICE)
                 if save_preds:
                     print('Saving predictions...')
                     # print some examples to a folder
@@ -100,9 +99,12 @@ class UNET:
 
 
 if __name__ == '__main__':
+    # model_path = 'runs\\2023-Mar-15_08h-10m-03s\\checkpoints\\unet_checkpoint_7.pth'
+    model_path = 'Checkpoints\\2023-Mar-14_19h-26m-12s_experiment_1\\unet_checkpoint_0.pth'
+
     unet = UNET(TRAIN_DATA_DIR,
                 TEST_DATA_DIR,
-                load_weights_path='runs\\2023-Mar-15_08h-10m-03s\\checkpoints\\unet_checkpoint_7.pth')
-    unet.test(save_preds=True)
+                load_weights_path=model_path)
+    unet.test(save_preds=False)
     # unet.train()
     
