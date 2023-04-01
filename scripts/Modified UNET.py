@@ -31,7 +31,7 @@ def call(self, x):
 
 # Encoder
 input_shape = (256, 256, 3)
-num_filters = 64
+num_filters = 128
 
 inputs = Input(input_shape)
 conv1 = Conv2D(num_filters, 3, activation='ReLU', padding='same', kernel_initializer='he_normal')(inputs)
