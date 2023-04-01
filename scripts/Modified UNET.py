@@ -5,6 +5,27 @@ import spektral
 from spektral.layers import  GATConv, ChebConv
 from keras.layers import Reshape
 from spektral.utils import sp_matrix_to_sp_tensor
+
+import tensorflow as tf
+
+class CenterOfMass(tf.keras.layers.Layer):
+    def __init__(self, **kwargs):
+        super(CenterOfMass, self).__init__(**kwargs)
+def call(self, x):
+    eps = 1.0e-6
+    m1 = tf.reduce_sum(x, axis=[1, 2], keepdims=True) + eps
+    M1 = tf.reduce_sum(m1, axis=[1, 3], keepdims=True) + eps
+    arange1 = tf.range(tf.shape(x)[1], dtype=tf.float32)
+    #arange1 = tf.reshape(arange1, (1, 1, -1, 1)) # Reshape arange1 to (1, 1, 256, 1)
+    c1 = tf.reduce_sum(arange1 * x, axis=[1, 2], keepdims=True) / M1
+    m2 = tf.reduce_sum(x, axis=[0, 2], keepdims=True) + eps
+    M2 = tf.reduce_sum(m2, axis=[0, 3], keepdims=True) + eps
+    arange2 = tf.range(tf.shape(x)[2], dtype=tf.float32)
+    arange2 = tf.reshape(arange2, (1, 1, 1, -1))
+    c2 = tf.reduce_sum(arange2 * x, axis=[1, 2], keepdims=True) / M2
+    c = tf.concat([c1, c2], axis=-1)
+    return c
+
 # Define custom layers to be used in the model
 #custom_objects = {'GATConv': GATConv, 'ChebConv': ChebConv}
 
