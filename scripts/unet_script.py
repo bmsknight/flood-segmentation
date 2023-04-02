@@ -14,6 +14,7 @@ from src.dataset import SegDataset, SegDataLoader
 from src.unet_model import UnetModel
 from src.utils import *
 from src.constants import *
+from src.losses import DiceLoss
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 EXPERIMENT_NAME = datetime.datetime.now().strftime("%Y-%b-%d_%Hh-%Mm-%Ss_") + "experiment_1"
@@ -69,7 +70,8 @@ class UNET:
             loop.set_postfix(loss=loss.item())
 
     def train(self):
-        loss_fn = nn.BCEWithLogitsLoss()  # cross entropy loss
+        # loss_fn = nn.BCEWithLogitsLoss()  # cross entropy loss
+        loss_fn = DiceLoss()
         optimizer = optim.Adam(self.model.parameters(), lr=LEARNING_RATE)
         scalar = torch.cuda.amp.GradScaler()
 
@@ -99,12 +101,14 @@ class UNET:
 
 
 if __name__ == '__main__':
-    # model_path = 'runs\\2023-Mar-15_08h-10m-03s\\checkpoints\\unet_checkpoint_7.pth'
-    model_path = 'Checkpoints\\2023-Mar-14_19h-26m-12s_experiment_1\\unet_checkpoint_0.pth'
+    # model_path = 'runs\\2023-Mar-15_08h-10m-03s\\checkpoints\\unet_checkpoint_7.pth'1339
+    # model_path = 'Checkpoints\\2023-Mar-14_19h-26m-12s_experiment_1\\unet_checkpoint_0.pth'
 
-    unet = UNET(TRAIN_DATA_DIR,
-                TEST_DATA_DIR,
-                load_weights_path=model_path)
+    # unet = UNET(TRAIN_DATA_DIR,
+    #             TEST_DATA_DIR,
+    #             load_weights_path=model_path)
+    unet = UNET(TRAIN_DATA_DIR, TEST_DATA_DIR)
+
     unet.test(save_preds=False)
-    # unet.train()
+    unet.train()
     
