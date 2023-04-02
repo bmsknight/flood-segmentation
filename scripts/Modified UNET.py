@@ -56,13 +56,13 @@ print(f'conv5 shape {conv5.shape}')
 pool5 = MaxPooling2D(pool_size=(2, 2))(conv5)
 
 #between encoder and decoder
-pool5_shape = pool5.shape.as_list()
-num_nodes = pool5_shape[1] * pool5_shape[2]
-n_features = pool5_shape[3] 
-channels = num_filters*10
-a = np.ones((num_nodes, num_nodes))
-pool5_reshaped = Reshape((-1, num_filters*10))(pool5)
-a_in = sp_matrix_to_sp_tensor(a)
+#pool5_shape = pool5.shape.as_list()
+#num_nodes = pool5_shape[1] * pool5_shape[2]
+#n_features = pool5_shape[3] 
+#channels = num_filters*10
+#a = np.ones((num_nodes, num_nodes))
+#pool5_reshaped = Reshape((-1, num_filters*10))(pool5)
+#a_in = sp_matrix_to_sp_tensor(a)
 
 #Graph Attention Networks
 gatconv = spektral.layers.GATConv(channels, attn_heads=4,
