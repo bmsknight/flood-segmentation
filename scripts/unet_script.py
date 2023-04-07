@@ -29,7 +29,7 @@ class UNET:
         
         self.load_weights_path = load_weights_path
         self.save_weights_path = save_weights_path
-        self.model = self.build_model(IN_CHANNELS, OUT_CHANNELS)
+        self.model = self.build_model(IN_CHANNELS, OUT_CHANNELS).to(DEVICE)
 
         if self.load_weights_path is not None:
             load_checkpoint(torch.load(self.load_weights_path), self.model)
@@ -48,7 +48,7 @@ class UNET:
         data_loader = SegDataLoader(dataset, batch_size=BATCH_SIZE, shuffle=SHUFFLE).get_dataloader()
         return data_loader
 
-    def train_fn(self, optimizer, loss_fn, scaler):
+    def train_fn(self, optimizer, loss_fn, scaler=None):
         print('Training in progress...')
         loop = tqdm(self.train_data_loader)
 
@@ -56,29 +56,35 @@ class UNET:
             data = data.to(device=DEVICE)
             targets = targets.float().to(device=DEVICE)
 
-            # forward
-            with torch.cuda.amp.autocast():
-                predictions = self.model(data)
-                loss = loss_fn(predictions, targets)
-
             optimizer.zero_grad()
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
+            predictions = self.model(data)
+            loss = loss_fn(predictions, targets)
+            loss.backward()
+            optimizer.step
+
+            # # forward
+            # with torch.cuda.amp.autocast():
+            #     predictions = self.model(data)
+            #     loss = loss_fn(predictions, targets)
+
+            # optimizer.zero_grad()
+            # scaler.scale(loss).backward()
+            # scaler.step(optimizer)
+            # scaler.update()
 
             # update tqdm loop
             loop.set_postfix(loss=loss.item())
 
     def train(self):
         # loss_fn = nn.BCEWithLogitsLoss()  # cross entropy loss
-        loss_fn = DiceLoss()
+        loss_fn = DiceLoss()  # Dice Loss
         optimizer = optim.Adam(self.model.parameters(), lr=LEARNING_RATE)
-        scalar = torch.cuda.amp.GradScaler()
+        # scalar = torch.cuda.amp.GradScaler()
 
         for epoch in range(START_EPOCH, EPOCHS):
             print(f"Epoch: {epoch}")
 
-            self.train_fn(optimizer, loss_fn, scalar)
+            self.train_fn(optimizer, loss_fn)
 
             # Save model
             checkpoint = {
@@ -89,7 +95,7 @@ class UNET:
             os.makedirs(self.save_weights_path, exist_ok=True)
             save_checkpoint(checkpoint, filename=os.path.join(self.save_weights_path, f"unet_checkpoint_{epoch}.pth"))
 
-            self.test(save_preds=True, directory=os.path.join('saved_images', f'{EXPERIMENT_NAME}', f'epoch-{epoch}_saved_images'))
+            self.test(save_preds=False, directory=os.path.join('saved_images', f'{EXPERIMENT_NAME}', f'epoch-{epoch}_saved_images'))
 
     def test(self, directory=os.path.join('runs',f'{EXPERIMENT_NAME}','saved_images'), save_preds=False):
                 # Evaluate
