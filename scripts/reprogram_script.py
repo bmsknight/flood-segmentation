@@ -29,32 +29,32 @@ optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, model.parameters
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 print(device)
-model.load_state_dict(torch.load("../models/segformer_reprogram_v2_74.pth"))
+
 model.train()
 print("Reprogram")
-for epoch in range(60, 61):  # loop over the dataset multiple times
+for epoch in range(0, 50):  # loop over the dataset multiple times
 
     print("Epoch:", epoch)
-    # for idx, batch in enumerate(tqdm(train_dataloader)):
-    #     # get the inputs;
-    #     pixel_values = batch["pixel_values"].to(device)
-    #     labels = batch["labels"].to(device)
-    #
-    #     # zero the parameter gradients
-    #     optimizer.zero_grad()
-    #
-    #     # forward + backward + optimize
-    #     outputs = model(pixel_values)
-    #     upsampled_outputs = nn.functional.interpolate(outputs, size=labels.shape[-2:], mode="bilinear",
-    #                                                  align_corners=False)
-    #     loss = loss_fn(upsampled_outputs, labels)
-    #
-    #     loss.backward()
-    #     optimizer.step()
-    #
-    #     # let's print loss and metrics every 100 batches
-    #     if idx % 50 == 0:
-    #         print("Loss:", loss.item())
+    for idx, batch in enumerate(tqdm(train_dataloader)):
+        # get the inputs;
+        pixel_values = batch["pixel_values"].to(device)
+        labels = batch["labels"].to(device)
+
+        # zero the parameter gradients
+        optimizer.zero_grad()
+
+        # forward + backward + optimize
+        outputs = model(pixel_values)
+        upsampled_outputs = nn.functional.interpolate(outputs, size=labels.shape[-2:], mode="bilinear",
+                                                      align_corners=False)
+        loss = loss_fn(upsampled_outputs, labels)
+
+        loss.backward()
+        optimizer.step()
+
+        # let's print loss and metrics every 100 batches
+        if idx % 50 == 0:
+            print("Loss:", loss.item())
     with torch.no_grad():
         dice_score = []
         iou = []
@@ -79,4 +79,4 @@ for epoch in range(60, 61):  # loop over the dataset multiple times
         print(f"Dice score: {dice_score}")
         print(f"IoU: {iou}")
         print(f"AP: {ap}")
-        # torch.save(model.state_dict(), f"../models/segformer_reprogram_v2_{epoch}.pth")
+        torch.save(model.state_dict(), f"../models/segformer_reprogram_v2_{epoch}.pth")
